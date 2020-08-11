@@ -1,23 +1,22 @@
-import { TextField, InputAdornment, InputLabel, Select, FormControl, createStyles, makeStyles, Theme } from "@material-ui/core"
-import React, { useState } from "react";
-import classes from "*.module.css";
+import { InputLabel, Select, FormControl } from "@material-ui/core"
+import React from "react";
 import ISelectInput from "./ISelectInput";
 
 
-export default function SelectInput(props: { value: any, options: ISelectInput[], onChange: any }) {
+export default function SelectInput(props: { value: any, options: ISelectInput[], onChange: any, name: string }) {
     async function handleChange(e) {
         props.onChange(e.target.value);
     }
     return (
         <FormControl variant="outlined" >
-            <InputLabel htmlFor="outlined-age-native-simple">Age</InputLabel>
+            <InputLabel htmlFor="outlined-age-native-simple">{props.name}</InputLabel>
             <Select
                 native
                 value={props.value}
                 onChange={handleChange}
                 inputProps={{
-                    name: "age",
-                    id: "filled-age-native-simple"
+                    name: props.name,
+                    id: "outlined-age-native-simple"
                 }}
             >
                 {props.options.map(e => <option value={e.label}>{e.label}</option>)}

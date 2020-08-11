@@ -7,6 +7,8 @@ import ICalculateCompoundInterest from './services/interfaces/Calculate/ICalcula
 import PercentageInput from './common/inputs/Percentage/PercentageInput';
 import { Grid, makeStyles, Theme, createStyles, Paper, Select, MenuItem, InputLabel } from '@material-ui/core';
 import SelectInput from './common/inputs/Select/SelectInput';
+import MoneyInput from './common/inputs/Money/MoneyInput';
+import { PeriodTypeEnum } from './services/enums/PeriodTypeEnum';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -37,21 +39,24 @@ const useStyles = makeStyles((theme: Theme) =>
 function App() {
 
   const [cycles, setCycles] = useState<ICycle[]>([]);
+
   const [calculatorInput, setCalculatorInput] = useState<ICalculateCompoundInterest>({
     interestRate: 0,
+    interestRateType: PeriodTypeEnum.monthly,
+
     initialPatrimony: 0,
     monthlyInvestedCapital: 0,
-    monthPeriod: 0
+
+    period: 0,
+    periodType: PeriodTypeEnum.monthly
   });
 
-  const [interestRateType, setInterestRateType] = useState("m");
-
   async function handleInterestRateTypeSelect(e) {
-    setInterestRateType(e);
+    setCalculatorInput({ ...calculatorInput, interestRateType: e as PeriodTypeEnum })
   }
 
-  async function handleInterestRate(e) {
-    setCalculatorInput({ ...calculatorInput, interestRate: e })
+  async function handlePeriodTypeSelect(e) {
+    setCalculatorInput({ ...calculatorInput, periodType: e as PeriodTypeEnum })
   }
 
   const classes = useStyles();
@@ -68,11 +73,11 @@ function App() {
       <Paper className={classes.paper}>
         <Grid container spacing={3}>
           <Grid item xs={6}>
-            <TextField
-              id="outlined-basic" label="Capital inicial" variant="outlined"
+            <MoneyInput
+              name={"Capital inicial"}
               value={calculatorInput?.initialPatrimony}
               onChange={
-                (e) => setCalculatorInput({ ...calculatorInput, initialPatrimony: Number(e.target.value) })
+                (e) => setCalculatorInput({ ...calculatorInput, initialPatrimony: e })
               }
             />
           </Grid>
@@ -92,28 +97,48 @@ function App() {
           <Grid item xs={3}>
             <PercentageInput
               name={"Percentual de Juros"}
-              onChange={handleInterestRate}
+              onChange={(e) => setCalculatorInput({ ...calculatorInput, interestRate: Number(e.target.value) })}
               value={calculatorInput.interestRate}
             />
 
           </Grid>
           <Grid item xs={3}>
-            <SelectInput value={interestRateType} onChange={handleInterestRateTypeSelect} options={
-              [
-                { label: "Mensal", value: "m" },
-                { label: "Anual", value: "a" }
-              ]
-            } />
+            <SelectInput
+              value={calculatorInput.interestRateType}
+              onChange={handleInterestRateTypeSelect}
+              options={
+                [
+                  { label: "Mensal", value: String(PeriodTypeEnum.monthly) },
+                  { label: "Anual", value: String(PeriodTypeEnum.annually) }
+                ]
+              }
+              name={""}
+            />
 
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid item xs={3}>
             <TextField
               id="outlined-basic" label="Período" variant="outlined"
-              value={calculatorInput?.monthPeriod}
+              value={calculatorInput?.period}
               onChange={
-                (e) => setCalculatorInput({ ...calculatorInput, monthPeriod: Number(e.target.value) })
+                (e) => setCalculatorInput({ ...calculatorInput, period: Number(e.target.value) })
               }
             />
+          </Grid>
+          <Grid item xs={3}>
+            <SelectInput
+              value={calculatorInput.periodType}
+              onChange={handlePeriodTypeSelect}
+              options={
+                [
+                  { label: "Meses", value: String(PeriodTypeEnum.monthly) },
+                  { label: "Anos", value: String(PeriodTypeEnum.annually) }
+                ]
+              }
+              name={""}
+            />
+
           </Grid>
         </Grid>
       </Paper >
