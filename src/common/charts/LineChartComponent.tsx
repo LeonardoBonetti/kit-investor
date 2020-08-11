@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
-import ILineChart from '../../services/interfaces/LineChart/ILineChart';
+import ILineChart from './ILineChart';
 import { Chart } from 'react-google-charts';
 import { count } from 'console';
 
@@ -15,10 +15,6 @@ function LineChartComponent(props: ILineChart) {
     chartValues.unshift(props.headers);
     setData(chartValues);
   }, []);
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   return (
     <Chart

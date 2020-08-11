@@ -4,17 +4,10 @@ import LineChartComponent from './common/charts/LineChartComponent';
 import ICycle from './services/interfaces/Calculate/ICycle';
 import TextField from '@material-ui/core/TextField';
 import ICalculateCompoundInterest from './services/interfaces/Calculate/ICalculateCompoundInterest';
-import PercentageInput from './common/inputs/PercentageInput';
-import { Grid, makeStyles, Theme, createStyles, Paper } from '@material-ui/core';
+import PercentageInput from './common/inputs/Percentage/PercentageInput';
+import { Grid, makeStyles, Theme, createStyles, Paper, Select, MenuItem, InputLabel } from '@material-ui/core';
+import SelectInput from './common/inputs/Select/SelectInput';
 
-const data = [
-  {
-    name: 'Mês 1', value: 100,
-  },
-  {
-    name: 'Mês 2', value: 120,
-  }
-];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   }),
 );
+
 function App() {
 
   const [cycles, setCycles] = useState<ICycle[]>([]);
@@ -50,7 +44,18 @@ function App() {
     monthPeriod: 0
   });
 
+  const [interestRateType, setInterestRateType] = useState("m");
+
+  async function handleInterestRateTypeSelect(e) {
+    setInterestRateType(e);
+  }
+
+  async function handleInterestRate(e) {
+    setCalculatorInput({ ...calculatorInput, interestRate: e })
+  }
+
   const classes = useStyles();
+
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
@@ -84,14 +89,23 @@ function App() {
 
           <Grid xs={12} />
 
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <PercentageInput
               name={"Percentual de Juros"}
-              onChange={(e) => setCalculatorInput({ ...calculatorInput, interestRate: e })}
+              onChange={handleInterestRate}
               value={calculatorInput.interestRate}
             />
-          </Grid>
 
+          </Grid>
+          <Grid item xs={3}>
+            <SelectInput value={interestRateType} onChange={handleInterestRateTypeSelect} options={
+              [
+                { label: "Mensal", value: "m" },
+                { label: "Anual", value: "a" }
+              ]
+            } />
+
+          </Grid>
           <Grid item xs={6}>
             <TextField
               id="outlined-basic" label="Período" variant="outlined"
