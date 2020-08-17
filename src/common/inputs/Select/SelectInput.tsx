@@ -19,7 +19,7 @@ export default function SelectInput(props: { value: any, options: ISelectInput[]
                     id: "outlined-age-native-simple"
                 }}
             >
-                {props.options.map(e => <option value={e.label}>{e.label}</option>)}
+                {props.options.map(e => <option value={e.value}>{e.label}</option>)}
             </Select>
         </FormControl>
     );

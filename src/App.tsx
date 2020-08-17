@@ -9,6 +9,8 @@ import { Grid, makeStyles, Theme, createStyles, Paper, Select, MenuItem, InputLa
 import SelectInput from './common/inputs/Select/SelectInput';
 import MoneyInput from './common/inputs/Money/MoneyInput';
 import { PeriodTypeEnum } from './services/enums/PeriodTypeEnum';
+import EquivalentInterest from './helpers/Calculate/EquivalentInterest';
+import { type } from 'os';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -38,25 +40,32 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function App() {
 
+
+
   const [cycles, setCycles] = useState<ICycle[]>([]);
 
   const [calculatorInput, setCalculatorInput] = useState<ICalculateCompoundInterest>({
     interestRate: 0,
     interestRateType: PeriodTypeEnum.monthly,
-
     initialPatrimony: 0,
     monthlyInvestedCapital: 0,
-
     period: 0,
     periodType: PeriodTypeEnum.monthly
   });
 
+  // useEffect(() => {
+  //   console.log(typeof calculatorInput.interestRate);
+  // }, [calculatorInput.interestRate]);
+
   async function handleInterestRateTypeSelect(e) {
-    setCalculatorInput({ ...calculatorInput, interestRateType: e as PeriodTypeEnum })
+    const newPeriodType = e as PeriodTypeEnum;
+    var equivalentInterest = EquivalentInterest({ currentPeriodType: calculatorInput.interestRateType, rate: calculatorInput.interestRate });
+    setCalculatorInput({ ...calculatorInput, interestRateType: newPeriodType, interestRate: equivalentInterest })
   }
 
   async function handlePeriodTypeSelect(e) {
-    setCalculatorInput({ ...calculatorInput, periodType: e as PeriodTypeEnum })
+    const periodType = e as PeriodTypeEnum;
+    setCalculatorInput({ ...calculatorInput, periodType: periodType })
   }
 
   const classes = useStyles();
@@ -83,12 +92,13 @@ function App() {
           </Grid>
 
           <Grid item xs={6}>
-            <TextField
-              id="outlined-basic" label="Aporte mensal" variant="outlined"
+            <MoneyInput
+              name={"Aporte mensal"}
               value={calculatorInput?.monthlyInvestedCapital}
               onChange={
-                (e) => setCalculatorInput({ ...calculatorInput, monthlyInvestedCapital: Number(e.target.value) })
+                (e) => setCalculatorInput({ ...calculatorInput, monthlyInvestedCapital: e })
               }
+
             />
           </Grid>
 
@@ -97,7 +107,10 @@ function App() {
           <Grid item xs={3}>
             <PercentageInput
               name={"Percentual de Juros"}
-              onChange={(e) => setCalculatorInput({ ...calculatorInput, interestRate: Number(e.target.value) })}
+              onChange={(e) => {
+                setCalculatorInput({ ...calculatorInput, interestRate: e })
+              }}
+
               value={calculatorInput.interestRate}
             />
 
@@ -108,8 +121,8 @@ function App() {
               onChange={handleInterestRateTypeSelect}
               options={
                 [
-                  { label: "Mensal", value: String(PeriodTypeEnum.monthly) },
-                  { label: "Anual", value: String(PeriodTypeEnum.annually) }
+                  { label: "Mensal", value: PeriodTypeEnum.monthly },
+                  { label: "Anual", value: PeriodTypeEnum.annually }
                 ]
               }
               name={""}

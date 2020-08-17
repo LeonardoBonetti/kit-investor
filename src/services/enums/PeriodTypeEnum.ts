@@ -1,4 +1,4 @@
 export enum PeriodTypeEnum {
-    monthly,
-    annually   
+    monthly = "monthly",
+    annually = "annually"
 }
