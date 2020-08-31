@@ -52,10 +52,9 @@ function App() {
     periodType: PeriodTypeEnum.monthly
   });
 
-  useEffect(() => {
-    calculate();
-  }, [calculatorInput])
-
+  // useEffect(() => {
+  // }, [calculatorInput])
+  //debounce JS
   async function handleInterestRateTypeSelect(e) {
     const newInterestRateType = e as PeriodTypeEnum;
     var equivalentInterest = EquivalentInterest({ currentPeriodType: calculatorInput.interestRateType, rate: calculatorInput.interestRate });
@@ -91,7 +90,7 @@ function App() {
               name={"Capital inicial"}
               value={calculatorInput?.initialPatrimony}
               onChange={
-                (e) => setCalculatorInput({ ...calculatorInput, initialPatrimony: e })
+                (e) => setCalculatorInput(state => ({ ...state, initialPatrimony: e }))
               }
             />
           </Grid>
@@ -101,7 +100,7 @@ function App() {
               name={"Aporte mensal"}
               value={calculatorInput?.monthlyInvestedCapital}
               onChange={
-                (e) => setCalculatorInput({ ...calculatorInput, monthlyInvestedCapital: e })
+                (e) => setCalculatorInput(state => ({ ...state, monthlyInvestedCapital: e }))
               }
 
             />
@@ -113,7 +112,7 @@ function App() {
             <PercentageInput
               name={"Percentual de Juros"}
               onChange={(e) => {
-                setCalculatorInput({ ...calculatorInput, interestRate: e })
+                setCalculatorInput(state => ({ ...state, interestRate: e }))
               }}
 
               value={calculatorInput.interestRate}
@@ -140,7 +139,7 @@ function App() {
               id="outlined-basic" label="Período" variant="outlined"
               value={calculatorInput?.period}
               onChange={
-                (e) => setCalculatorInput({ ...calculatorInput, period: Number(e.target.value) })
+                (e) => setCalculatorInput(state => ({ ...state, period: Number(e.target.value) }))
               }
             />
           </Grid>
