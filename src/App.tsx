@@ -1,16 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
 import LineChartComponent from './common/charts/LineChartComponent';
-import ICycle from './services/interfaces/Calculate/ICycle';
 import TextField from '@material-ui/core/TextField';
 import ICalculateCompoundInterest from './services/interfaces/Calculate/ICalculateCompoundInterest';
 import PercentageInput from './common/inputs/Percentage/PercentageInput';
-import { Grid, makeStyles, Theme, createStyles, Paper, Select, MenuItem, InputLabel } from '@material-ui/core';
+import { Grid, makeStyles, Theme, createStyles, Paper, Select, MenuItem, InputLabel, Button } from '@material-ui/core';
 import SelectInput from './common/inputs/Select/SelectInput';
 import MoneyInput from './common/inputs/Money/MoneyInput';
 import { PeriodTypeEnum } from './services/enums/PeriodTypeEnum';
-import EquivalentInterest from './helpers/Calculate/EquivalentInterest';
-import { type } from 'os';
+import CalculateCompoundInterest from './helpers/Calculate/CalculateCompoundInterest/CalculateCompoundInterest';
+import EquivalentPeriod from './helpers/Calculate/EquivalentCalculators/EquivalentPeriod';
+import EquivalentInterest from './helpers/Calculate/EquivalentCalculators/EquivalentInterest';
+import Cycle from './models/Cycle';
+import { MoneyMask } from './helpers/Mask/MoneyMask';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,9 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center"
     },
     calculatorGraph: {
-      margin: 'auto',
-      maxWidth: 600,
-      marginTop: 20
+
     },
     paper: {
       padding: theme.spacing(2),
@@ -41,31 +41,36 @@ const useStyles = makeStyles((theme: Theme) =>
 function App() {
 
 
-
-  const [cycles, setCycles] = useState<ICycle[]>([]);
+  const [cycles, setCycles] = useState<Cycle[]>([]);
 
   const [calculatorInput, setCalculatorInput] = useState<ICalculateCompoundInterest>({
-    interestRate: 0,
+    interestRate: 0.8,
     interestRateType: PeriodTypeEnum.monthly,
-    initialPatrimony: 0,
-    monthlyInvestedCapital: 0,
-    period: 0,
+    initialPatrimony: 55000 * 100,
+    monthlyInvestedCapital: 100 * 100,
+    period: 360,
     periodType: PeriodTypeEnum.monthly
   });
 
-  // useEffect(() => {
-  //   console.log(typeof calculatorInput.interestRate);
-  // }, [calculatorInput.interestRate]);
+  useEffect(() => {
+    calculate();
+  }, [calculatorInput])
 
   async function handleInterestRateTypeSelect(e) {
-    const newPeriodType = e as PeriodTypeEnum;
+    const newInterestRateType = e as PeriodTypeEnum;
     var equivalentInterest = EquivalentInterest({ currentPeriodType: calculatorInput.interestRateType, rate: calculatorInput.interestRate });
-    setCalculatorInput({ ...calculatorInput, interestRateType: newPeriodType, interestRate: equivalentInterest })
+    setCalculatorInput({ ...calculatorInput, interestRateType: newInterestRateType, interestRate: equivalentInterest })
   }
 
   async function handlePeriodTypeSelect(e) {
-    const periodType = e as PeriodTypeEnum;
-    setCalculatorInput({ ...calculatorInput, periodType: periodType })
+    const newPeriodType = e as PeriodTypeEnum;
+    const newPeriod = EquivalentPeriod({ period: calculatorInput.period, currentPeriodType: calculatorInput.periodType });
+    setCalculatorInput({ ...calculatorInput, periodType: newPeriodType, period: newPeriod })
+  }
+
+  async function calculate() {
+    var c = await CalculateCompoundInterest(calculatorInput);
+    setCycles(c.cycles);
   }
 
   const classes = useStyles();
@@ -155,12 +160,28 @@ function App() {
           </Grid>
         </Grid>
       </Paper >
-
       <Grid container spacing={3}>
         <Grid item xs className={classes.calculatorGraph}>
-          <LineChartComponent headers={["x", "cat", "dog"]} values={[[0, 2, 0], [1, 4, 10]]} />
+          <Button onClick={calculate}>
+            Calcular
+          </Button>
         </Grid>
       </Grid>
+      <Grid container spacing={3}>
+        <Grid item xs className={classes.calculatorGraph}>
+          <LineChartComponent
+            headers={["meses", "Total investido", "Patrimônio total", "Renda Mensal"]}
+            values={
+              cycles.map(c => [
+                c.month,
+                { v: c.totalInvestedCapital, f: MoneyMask(c.totalInvestedCapital) },
+                { v: c.finalPatrimony, f: MoneyMask(c.finalPatrimony) },
+                { v: c.monthlyInterestIncome, f: MoneyMask(c.monthlyInterestIncome) }
+              ]
+              )} />
+        </Grid>
+      </Grid>
+
 
     </div>
   );

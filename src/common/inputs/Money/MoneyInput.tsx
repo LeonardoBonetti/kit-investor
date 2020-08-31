@@ -7,7 +7,7 @@ export default function MoneyInput(props: { value: number; onChange: any; name: 
         let r = parseFloat(str.replace(/[^\d]+/gi, '')) / 100;
         r = isNaN(r) ? 0 : r;
         let result = r.toLocaleString('pt-br', { style: "decimal", minimumFractionDigits: 2 });
-        props.onChange(Number(result));
+        props.onChange(result);
     }
 
     return (

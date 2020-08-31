@@ -1,4 +1,4 @@
-import { PeriodTypeEnum } from "../../services/enums/PeriodTypeEnum";
+import { PeriodTypeEnum } from "../../../services/enums/PeriodTypeEnum";
 
 export default interface IEquivalentInterest {
     currentPeriodType: PeriodTypeEnum;
